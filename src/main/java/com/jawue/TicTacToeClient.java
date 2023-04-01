@@ -2,8 +2,12 @@ package com.jawue;
 
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jawue.shared.message.Message;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.handshake.ServerHandshake;
@@ -13,14 +17,16 @@ import org.java_websocket.handshake.ServerHandshake;
  * important callbacks are overloaded.
  */
 public class TicTacToeClient extends WebSocketClient {
-
+  public BlockingQueue<Message> messages = new LinkedBlockingQueue<>();
   public TicTacToeClient(URI serverUri, Draft draft) {
     super(serverUri, draft);
   }
 
+  public ObjectMapper mapper = new ObjectMapper();
   public TicTacToeClient(URI serverURI) {
     super(serverURI);
   }
+
 
   public TicTacToeClient(URI serverUri, Map<String, String> httpHeaders) {
     super(serverUri, httpHeaders);
@@ -35,7 +41,14 @@ public class TicTacToeClient extends WebSocketClient {
 
   @Override
   public void onMessage(String message) {
-    System.out.println("received: " + message);
+    try {
+      System.out.println(message);
+      Message messageObject = mapper.readValue(message, Message.class);
+      messages.add(messageObject);
+      System.out.println("received: " + message );
+    } catch(Exception error) {
+      System.err.println(error.getMessage());
+    }
   }
 
   @Override
@@ -51,6 +64,24 @@ public class TicTacToeClient extends WebSocketClient {
     ex.printStackTrace();
     // if the error is fatal then onClose will be called additionally
   }
+
+  public Message nextMessageBlocking() {
+    try {
+      return messages.take();
+    } catch (Exception error) {
+      System.err.println(error.getMessage());
+    }
+    return null;
+  }
+  public void sendMessage(Message message) {
+    try {
+      this.send(mapper.writeValueAsString(message));
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+
 
 
 

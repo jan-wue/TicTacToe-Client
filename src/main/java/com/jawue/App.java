@@ -1,7 +1,8 @@
 package com.jawue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jawue.message.PlayerMoveMessage;
+import com.jawue.shared.message.Message;
+import com.jawue.shared.message.PlayerMoveMessage;
+import com.jawue.shared.message.RequestMoveMessage;
 
 import java.net.URI;
 
@@ -14,13 +15,22 @@ public class App {
               "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
 
       c.connectBlocking();
-      ObjectMapper mapper = new ObjectMapper();
-      PlayerMoveMessage object = new PlayerMoveMessage("testibus", 'x');
-      String objectAsString = mapper.writeValueAsString(object);
-      c.send(objectAsString);
+
+      Message message;
+     Message playerMoveMessage = new PlayerMoveMessage("A2", 'X');
+      c.sendMessage(playerMoveMessage);
+      while(true) {
+       message = c.nextMessageBlocking();
+
+       if(message instanceof RequestMoveMessage) {
+
+       }
+      }
+
     } catch (Exception ignored) {
       System.err.println(ignored.getMessage());
     }
+
 
   }
 

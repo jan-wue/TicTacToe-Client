@@ -1,15 +1,15 @@
-package com.jawue.message;
+package com.jawue.shared.message;
 
 public class PlayerMoveMessage extends Message {
   private String field;
   private Character playerChar;
 
-  public PlayerMoveMessage() {
-  }
-
   public PlayerMoveMessage(String field, Character playerChar) {
     this.field = field;
     this.playerChar = playerChar;
+  }
+
+  public PlayerMoveMessage() {
   }
 
   public String getField() {
