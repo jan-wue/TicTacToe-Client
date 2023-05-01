@@ -1,10 +1,9 @@
 package com.jawue;
 
-import com.jawue.shared.message.Message;
-import com.jawue.shared.message.PlayerMoveMessage;
-import com.jawue.shared.message.RequestMoveMessage;
+import com.jawue.shared.message.*;
 
 import java.net.URI;
+import java.sql.SQLOutput;
 
 public class App {
 
@@ -16,15 +15,24 @@ public class App {
 
       c.connectBlocking();
 
-      Message message;
-     Message playerMoveMessage = new PlayerMoveMessage("A2", 'X');
-      c.sendMessage(playerMoveMessage);
-      while(true) {
-       message = c.nextMessageBlocking();
+      Message receivedMessage;
+      while (true) {
+        receivedMessage = c.nextMessageBlocking();
 
-       if(message instanceof RequestMoveMessage) {
+        if (receivedMessage instanceof RequestMoveMessage) {
+          Message message = new PlayerMoveMessage("A2", 'x');
+          c.sendMessage(message);
+        } else if (receivedMessage instanceof MoveResultMessage) {
+          MoveResultMessage moveResult = (MoveResultMessage) receivedMessage;
+          System.out.println(moveResult.getBoard());
+          System.out.println(moveResult.getErrorMessage());
+        } else if (receivedMessage instanceof ConnectMessage) {
+          System.out.println("connected");
+        } else if (receivedMessage instanceof GameFinishedMessage) {
+          GameFinishedMessage gameFinishedMessage = (GameFinishedMessage) receivedMessage;
+          System.out.println(gameFinishedMessage.getWinnerResult());
 
-       }
+        }
       }
 
     } catch (Exception ignored) {

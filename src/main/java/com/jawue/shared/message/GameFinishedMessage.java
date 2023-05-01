@@ -8,4 +8,15 @@ WinnerResult winnerResult;
   public GameFinishedMessage(WinnerResult winnerResult) {
     this.winnerResult = winnerResult;
   }
+
+  public WinnerResult getWinnerResult() {
+    return winnerResult;
+  }
+
+  public void setWinnerResult(WinnerResult winnerResult) {
+    this.winnerResult = winnerResult;
+  }
+
 }
+
+
