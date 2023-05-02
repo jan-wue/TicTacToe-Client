@@ -1,5 +1,6 @@
 package com.jawue;
 
+import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
 import com.jawue.shared.message.*;
 
@@ -23,12 +24,15 @@ public class App {
 
         if (receivedMessage instanceof RequestMoveMessage) {
           Message message = new PlayerMoveMessage();
-          ((PlayerMoveMessage)message).setPlayerMove(userInteraction.getMove());
+          ((PlayerMoveMessage) message).setPlayerMove(userInteraction.getMove());
           c.sendMessage(message);
         } else if (receivedMessage instanceof MoveResultMessage) {
           MoveResultMessage moveResult = (MoveResultMessage) receivedMessage;
-          //Todo userInteraction.board and error
-          System.out.println(moveResult.getBoard());
+          if (moveResult.getErrorMessage() == null) {
+              Board board = moveResult.getBoard();
+              board.print();
+          }
+            System.out.println(moveResult.getBoard());
           System.out.println(moveResult.getErrorMessage());
         } else if (receivedMessage instanceof ConnectMessage) {
           System.out.println("connected");
