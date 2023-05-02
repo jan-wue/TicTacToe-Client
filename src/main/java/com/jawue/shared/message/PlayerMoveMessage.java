@@ -1,30 +1,23 @@
 package com.jawue.shared.message;
 
-public class PlayerMoveMessage extends Message {
-  private String field;
-  private Character playerChar;
+import com.jawue.PlayerMove;
 
-  public PlayerMoveMessage(String field, Character playerChar) {
-    this.field = field;
-    this.playerChar = playerChar;
-  }
+public class PlayerMoveMessage extends Message {
+  private PlayerMove playerMove;
 
   public PlayerMoveMessage() {
+
   }
 
-  public String getField() {
-    return field;
+  public PlayerMoveMessage(PlayerMove playerMove) {
+    this.playerMove = playerMove;
   }
 
-  public Character getPlayerChar() {
-    return playerChar;
+  public PlayerMove getPlayerMove() {
+    return playerMove;
   }
 
-  public void setPlayerChar(Character playerChar) {
-    this.playerChar = playerChar;
-  }
-
-  public void setField(String field) {
-    this.field = field;
+  public void setPlayerMove(PlayerMove playerMove) {
+    this.playerMove = playerMove;
   }
 }

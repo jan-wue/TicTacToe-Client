@@ -16,14 +16,17 @@ public class App {
       c.connectBlocking();
 
       Message receivedMessage;
+      UserInteraction userInteraction = new Terminal();
       while (true) {
         receivedMessage = c.nextMessageBlocking();
 
         if (receivedMessage instanceof RequestMoveMessage) {
-          Message message = new PlayerMoveMessage("A2", 'x');
+          PlayerMoveMessage message = new PlayerMoveMessage();
+          message.setPlayerMove(userInteraction.getMove());
           c.sendMessage(message);
         } else if (receivedMessage instanceof MoveResultMessage) {
           MoveResultMessage moveResult = (MoveResultMessage) receivedMessage;
+          //Todo userInteraction.board and error
           System.out.println(moveResult.getBoard());
           System.out.println(moveResult.getErrorMessage());
         } else if (receivedMessage instanceof ConnectMessage) {
