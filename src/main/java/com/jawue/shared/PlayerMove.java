@@ -1,4 +1,4 @@
-package com.jawue;
+package com.jawue.shared;
 
 public class PlayerMove {
   private Character row;

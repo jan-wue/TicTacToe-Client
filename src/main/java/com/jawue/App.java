@@ -1,5 +1,6 @@
 package com.jawue;
 
+import com.jawue.shared.PlayerMove;
 import com.jawue.shared.message.*;
 
 import java.net.URI;
@@ -21,8 +22,8 @@ public class App {
         receivedMessage = c.nextMessageBlocking();
 
         if (receivedMessage instanceof RequestMoveMessage) {
-          PlayerMoveMessage message = new PlayerMoveMessage();
-          message.setPlayerMove(userInteraction.getMove());
+          Message message = new PlayerMoveMessage();
+          ((PlayerMoveMessage)message).setPlayerMove(userInteraction.getMove());
           c.sendMessage(message);
         } else if (receivedMessage instanceof MoveResultMessage) {
           MoveResultMessage moveResult = (MoveResultMessage) receivedMessage;

@@ -1,6 +1,6 @@
 package com.jawue.shared.message;
 
-import com.jawue.PlayerMove;
+import com.jawue.shared.PlayerMove;
 
 public class PlayerMoveMessage extends Message {
   private PlayerMove playerMove;
