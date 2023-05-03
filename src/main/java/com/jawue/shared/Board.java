@@ -16,6 +16,7 @@ public class Board {
 
 
   public void print() {
+    this.initialize();
     System.out.println("       |     |");
     for (int i = 0; i < 3; i++) {
 
@@ -41,5 +42,15 @@ public class Board {
 
     System.out.println("       |     |");
     System.out.println("\n   " + " A " + "    B " + "    C  ");
+  }
+
+  public void initialize() {
+    for(int i = 0; i < this.board.length; i++) {
+      for(int j = 0; j < this.board[i].length; j++) {
+        if(board[i][j] == null) {
+          board[i][j] = " ";
+        }
+      }
+    }
   }
 }
