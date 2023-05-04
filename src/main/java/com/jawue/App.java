@@ -17,23 +17,26 @@ public class App {
 
       c.connectBlocking();
 
+
       Message receivedMessage;
       UserInteraction userInteraction = new Terminal();
       while (true) {
         receivedMessage = c.nextMessageBlocking();
-
         if (receivedMessage instanceof RequestMoveMessage) {
           Message message = new PlayerMoveMessage();
           ((PlayerMoveMessage) message).setPlayerMove(userInteraction.getMove());
           c.sendMessage(message);
         } else if (receivedMessage instanceof MoveResultMessage) {
-          MoveResultMessage moveResult = (MoveResultMessage) receivedMessage;
-          if (moveResult.getErrorMessage() == null) {
-              Board board = moveResult.getBoard();
-              board.print();
+          MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
+          if (moveResultMessage.getErrorMessage() == null) {
+            Board board = moveResultMessage.getBoard();
+          } else {
+            Message message = new PlayerMoveMessage();
+            System.out.println(moveResultMessage.getErrorMessage());
+            System.out.println();
+            System.out.println(moveResultMessage.getBoard());
           }
-            System.out.println(moveResult.getBoard());
-          System.out.println(moveResult.getErrorMessage());
+
         } else if (receivedMessage instanceof ConnectMessage) {
           System.out.println("connected");
         } else if (receivedMessage instanceof GameFinishedMessage) {

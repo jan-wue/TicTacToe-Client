@@ -42,10 +42,8 @@ public class TicTacToeClient extends WebSocketClient {
   @Override
   public void onMessage(String message) {
     try {
-      System.out.println(message);
       Message messageObject = mapper.readValue(message, Message.class);
       messages.add(messageObject);
-      System.out.println("received: " + message );
     } catch(Exception error) {
       System.err.println(error.getMessage());
     }
