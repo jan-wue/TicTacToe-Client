@@ -14,6 +14,7 @@ public class App {
     try {
       TicTacToeClient c = new TicTacToeClient(new URI(
               "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+              //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
 
       c.connectBlocking();
 
@@ -30,19 +31,21 @@ public class App {
           MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
           if (moveResultMessage.getErrorMessage() == null) {
             Board board = moveResultMessage.getBoard();
+            board.print();
           } else {
             Message message = new PlayerMoveMessage();
             System.out.println(moveResultMessage.getErrorMessage());
             System.out.println();
-            System.out.println(moveResultMessage.getBoard());
           }
 
         } else if (receivedMessage instanceof ConnectMessage) {
-          System.out.println("connected");
+          System.out.println("you are connected bro");
         } else if (receivedMessage instanceof GameFinishedMessage) {
           GameFinishedMessage gameFinishedMessage = (GameFinishedMessage) receivedMessage;
           System.out.println(gameFinishedMessage.getWinnerResult());
 
+        } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
+          System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
         }
       }
 
