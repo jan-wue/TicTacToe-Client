@@ -1,6 +1,6 @@
 package com.jawue.shared.message;
 
-import com.jawue.shared.Board;
+import com.jawue.Board;
 
 public class MoveResultMessage extends Message {
   private Board board;

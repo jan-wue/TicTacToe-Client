@@ -1,6 +1,8 @@
-package com.jawue.shared;
+package com.jawue;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.jawue.shared.GameSymbol;
+import com.jawue.shared.PlayerMove;
 
 import java.util.ArrayList;
 import java.util.Arrays;

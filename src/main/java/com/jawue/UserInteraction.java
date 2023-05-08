@@ -1,6 +1,5 @@
 package com.jawue;
 
-import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
 
 public interface UserInteraction {

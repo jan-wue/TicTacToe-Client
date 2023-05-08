@@ -1,11 +1,8 @@
 package com.jawue;
 
-import com.jawue.shared.Board;
-import com.jawue.shared.PlayerMove;
 import com.jawue.shared.message.*;
 
 import java.net.URI;
-import java.sql.SQLOutput;
 
 public class App {
 
@@ -21,7 +18,11 @@ public class App {
 
       Message receivedMessage;
       UserInteraction userInteraction = new Terminal();
+      Board boardBeginning = new Board(); // this board is only used once when the player chooses the first move.
+      boardBeginning.initialize();
+      boardBeginning.print();
       while (true) {
+
         receivedMessage = c.nextMessageBlocking();
         if (receivedMessage instanceof RequestMoveMessage) {
           Message message = new PlayerMoveMessage();
@@ -42,7 +43,7 @@ public class App {
           System.out.println("you are connected bro");
         } else if (receivedMessage instanceof GameFinishedMessage) {
           GameFinishedMessage gameFinishedMessage = (GameFinishedMessage) receivedMessage;
-          System.out.println(gameFinishedMessage.getWinnerResult());
+          System.out.println(gameFinishedMessage.getResult());
 
         } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
           System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());

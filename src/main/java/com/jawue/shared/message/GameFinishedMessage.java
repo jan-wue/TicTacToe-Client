@@ -1,22 +1,19 @@
 package com.jawue.shared.message;
 
-import com.jawue.shared.WinnerResult;
-
 public class GameFinishedMessage extends Message {
-WinnerResult winnerResult;
+private String result;
 
-  public GameFinishedMessage(WinnerResult winnerResult) {
-    this.winnerResult = winnerResult;
+  public GameFinishedMessage(String result) {
+    this.result = result;
   }
 
-  public WinnerResult getWinnerResult() {
-    return winnerResult;
+  public String getResult() {
+    return result;
   }
 
-  public void setWinnerResult(WinnerResult winnerResult) {
-    this.winnerResult = winnerResult;
+  public void setResult(String result) {
+    this.result = result;
   }
-
 }
 
 
