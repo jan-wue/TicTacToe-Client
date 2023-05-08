@@ -11,8 +11,13 @@ public class Terminal implements UserInteraction {
   public PlayerMove getMove() {
     PlayerMove playerMove = new PlayerMove();
     Scanner input = new Scanner(System.in);
-    System.out.println("Please enter a move for instance A2");
-    String userInput = input.next();
+    System.out.println("Please enter a valid move first you have to type the column letter and than the row number for instance A2");
+    String userInput = input.next().toUpperCase();
+    while(userInput.length() != 2) {
+      System.out.println("Invalid Move please type again");
+     userInput = input.next().toUpperCase();
+
+    }
     playerMove.setColumn(userInput.charAt(0));
     playerMove.setRow(userInput.charAt(1));
     return playerMove;
