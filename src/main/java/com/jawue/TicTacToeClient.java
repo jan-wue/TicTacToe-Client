@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jawue.shared.message.Message;
 import org.java_websocket.client.WebSocketClient;
@@ -42,6 +43,9 @@ public class TicTacToeClient extends WebSocketClient {
   @Override
   public void onMessage(String message) {
     try {
+      //ignores boardIsFull method in webserver
+      mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
       Message messageObject = mapper.readValue(message, Message.class);
       messages.add(messageObject);
     } catch(Exception error) {

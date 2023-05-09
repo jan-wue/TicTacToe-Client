@@ -1,5 +1,7 @@
 package com.jawue;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.jawue.shared.GameSymbol;
 import com.jawue.shared.PlayerMove;
@@ -8,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-@JsonSerialize
+@JsonIgnoreProperties
 public class Board {
   String[][] board = new String[3][3];
 
@@ -65,6 +66,7 @@ public class Board {
     int columnIndex = move.getColumn() - 'A';
     this.board[rowIndex][columnIndex] = GameSymbol.X.getSYMBOL();
   }
+  @JsonSerialize
   public boolean isMoveValid(PlayerMove playerMove) {
     final List<Character> VALIDROWCHARS = Collections.unmodifiableList(new ArrayList<Character>(Arrays.asList('0', '1', '2')));
     final List<Character> VALIDCOLUMNCHARS = Collections.unmodifiableList(new ArrayList<Character>(Arrays.asList('A', 'B', 'C')));

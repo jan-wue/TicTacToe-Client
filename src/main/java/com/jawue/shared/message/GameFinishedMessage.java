@@ -1,11 +1,12 @@
 package com.jawue.shared.message;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@JsonSerialize
 public class GameFinishedMessage extends Message {
 private String result;
 
   public GameFinishedMessage() {
-
   }
 
   public GameFinishedMessage(String result) {
@@ -19,6 +20,7 @@ private String result;
   public void setResult(String result) {
     this.result = result;
   }
+
 }
 
 
