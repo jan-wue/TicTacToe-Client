@@ -1,7 +1,9 @@
 package com.jawue;
 
+import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Terminal implements UserInteraction {
@@ -36,5 +38,10 @@ public class Terminal implements UserInteraction {
   @Override
   public void displayInfoMessage(String string) {
 
+  }
+
+  @Override
+  public String askUser(List<String> list) {
+    return null;
   }
 }

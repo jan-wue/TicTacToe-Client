@@ -1,5 +1,6 @@
 package com.jawue;
 
+import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
 
 import java.util.*;

@@ -1,8 +1,6 @@
 package com.jawue.shared.message;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.jawue.Board;
-@JsonIgnoreProperties
+import com.jawue.shared.Board;
 
 public class MoveResultMessage extends Message {
   private Board board;

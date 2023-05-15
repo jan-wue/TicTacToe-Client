@@ -1,8 +1,15 @@
 package com.jawue;
 
+import com.jawue.shared.Answer;
+import com.jawue.shared.Board;
 import com.jawue.shared.message.*;
 
 import java.net.URI;
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class App {
 
@@ -18,9 +25,9 @@ public class App {
 
       Message receivedMessage;
       UserInteraction userInteraction = new Terminal();
-      Board boardBeginning = new Board(); // this board is only used once when the player chooses the first move.
-      boardBeginning.initialize();
-      boardBeginning.print();
+      Board board = new Board();
+      board.initialize();
+      board.print();
       while (true) {
 
         receivedMessage = c.nextMessageBlocking();
@@ -31,7 +38,8 @@ public class App {
         } else if (receivedMessage instanceof MoveResultMessage) {
           MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
           if (moveResultMessage.getErrorMessage() == null) {
-            Board board = moveResultMessage.getBoard();
+            board = moveResultMessage.getBoard();
+            System.out.println("trororrror " + moveResultMessage.getBoard());
             board.print();
           } else {
             Message message = new PlayerMoveMessage();
@@ -48,6 +56,12 @@ public class App {
         } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
           System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
         }
+        else if(receivedMessage instanceof PlayAgainMessage) {
+         PlayAgainMessage message = new PlayAgainMessage();
+         boolean playerAnswer = getPlayerAnswer(receivedMessage);
+         message.setPlayerAnswer(playerAnswer);
+         c.sendMessage(message);
+        }
       }
 
     } catch (Exception ignored) {
@@ -55,6 +69,32 @@ public class App {
     }
 
 
+
+
+  }
+  public static boolean getPlayerAnswer(Message receivedMessage) {
+    Scanner input = new Scanner(System.in);
+    System.out.println(((PlayAgainMessage) receivedMessage).getMessage());
+    boolean isInputValid = false;
+    while(!isInputValid) {
+      List<Character> validAnswer = new ArrayList<>(Arrays.asList('Y', 'N'));
+      String answer = input.next().toUpperCase();
+      if(answer.length() != 1) {
+        System.out.println("Answer is not valid, please try again");
+        continue;
+      }
+      if(!validAnswer.contains(answer.charAt(0))) {
+        System.out.println("Answer is not valid, please try again");
+        continue;
+      }
+
+      if (answer.equals("Y")) {
+        return true;
+      }
+
+      isInputValid = true;
+    }
+    return false;
   }
 
 
