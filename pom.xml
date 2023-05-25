@@ -30,7 +30,16 @@
     <groupId>org.java-websocket</groupId>
     <artifactId>Java-WebSocket</artifactId>
     <version>1.5.3</version>
-   </dependency> 
+   </dependency>
+
+    <dependency>
+      <groupId>com.jawue</groupId>
+      <artifactId>milkyway</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/milkyway-1.0-SNAPSHOT.jar</systemPath>
+    </dependency>
+
 
   </dependencies>
 

@@ -1,11 +1,9 @@
 package com.jawue;
 
-import com.jawue.shared.Answer;
 import com.jawue.shared.Board;
 import com.jawue.shared.message.*;
 
 import java.net.URI;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,12 +37,12 @@ public class App {
           MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
           if (moveResultMessage.getErrorMessage() == null) {
             board = moveResultMessage.getBoard();
-            System.out.println("trororrror " + moveResultMessage.getBoard());
             board.print();
           } else {
             Message message = new PlayerMoveMessage();
             System.out.println(moveResultMessage.getErrorMessage());
             System.out.println();
+
           }
 
         } else if (receivedMessage instanceof ConnectMessage) {
