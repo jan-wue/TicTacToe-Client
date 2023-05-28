@@ -8,31 +8,45 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 public class App {
 
 
   public static void main(String[] args) {
+
     try {
-      TicTacToeClient c = new TicTacToeClient(new URI(
+      App app = new App();
+      TicTacToeClient client = new TicTacToeClient(new URI(
               "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
-              //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+      //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
 
-      c.connectBlocking();
+      if( args.length > 0 && args[0].equals("--terminal")) {
+        app.runTerminalClient(client);
+      } else {
+        app.runGui(client);
+      }
+    } catch (Exception ex) {
+      System.err.println(ex);
+    }
 
+  }
 
+  public void runTerminalClient(TicTacToeClient client) {
+    try {
+     client.connectBlocking();
       Message receivedMessage;
       UserInteraction userInteraction = new Terminal();
       Board board = new Board();
       board.initialize();
       board.print();
       while (true) {
-
-        receivedMessage = c.nextMessageBlocking();
+        receivedMessage = client.nextMessageBlocking();
         if (receivedMessage instanceof RequestMoveMessage) {
           Message message = new PlayerMoveMessage();
           ((PlayerMoveMessage) message).setPlayerMove(userInteraction.getMove());
-          c.sendMessage(message);
+          client.sendMessage(message);
         } else if (receivedMessage instanceof MoveResultMessage) {
           MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
           if (moveResultMessage.getErrorMessage() == null) {
@@ -42,7 +56,6 @@ public class App {
             Message message = new PlayerMoveMessage();
             System.out.println(moveResultMessage.getErrorMessage());
             System.out.println();
-
           }
 
         } else if (receivedMessage instanceof ConnectMessage) {
@@ -53,12 +66,11 @@ public class App {
 
         } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
           System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
-        }
-        else if(receivedMessage instanceof PlayAgainMessage) {
-         PlayAgainMessage message = new PlayAgainMessage();
-         boolean playerAnswer = getPlayerAnswer(receivedMessage);
-         message.setPlayerAnswer(playerAnswer);
-         c.sendMessage(message);
+        } else if (receivedMessage instanceof PlayAgainMessage) {
+          PlayAgainMessage message = new PlayAgainMessage();
+          boolean playerAnswer = getPlayerAnswer(receivedMessage);
+          message.setPlayerAnswer(playerAnswer);
+          client.sendMessage(message);
         }
       }
 
@@ -66,22 +78,44 @@ public class App {
       System.err.println(ignored.getMessage());
     }
 
-
-
-
   }
+
+    public void runGui(TicTacToeClient client) {
+      ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+      WebsocketThread websockedThread = new WebsocketThread(client, messageQueue);
+      websockedThread.start();
+      Grid grid = new Grid(client);
+      com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
+      com.jawue.milkyway.App.guiObjects.add(grid);
+      Board board = new Board();
+
+      while (true) {
+        gui.draw();
+        Message receivedMessage = messageQueue.peek();
+        if(receivedMessage == null) {
+          continue;
+        }
+        if (receivedMessage instanceof MoveResultMessage) {
+          board = ((MoveResultMessage) receivedMessage).getBoard();
+          grid.updateBoard(board);
+        }
+
+      }
+
+    }
+
   public static boolean getPlayerAnswer(Message receivedMessage) {
     Scanner input = new Scanner(System.in);
     System.out.println(((PlayAgainMessage) receivedMessage).getMessage());
     boolean isInputValid = false;
-    while(!isInputValid) {
+    while (!isInputValid) {
       List<Character> validAnswer = new ArrayList<>(Arrays.asList('Y', 'N'));
       String answer = input.next().toUpperCase();
-      if(answer.length() != 1) {
+      if (answer.length() != 1) {
         System.out.println("Answer is not valid, please try again");
         continue;
       }
-      if(!validAnswer.contains(answer.charAt(0))) {
+      if (!validAnswer.contains(answer.charAt(0))) {
         System.out.println("Answer is not valid, please try again");
         continue;
       }
@@ -94,6 +128,4 @@ public class App {
     }
     return false;
   }
-
-
 }

@@ -105,8 +105,8 @@ public class Board {
 
   }
 
-
-
-
+  public String[][] getBoard() {
+    return board;
+  }
 }
 

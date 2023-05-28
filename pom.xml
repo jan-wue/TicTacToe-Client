@@ -35,9 +35,7 @@
     <dependency>
       <groupId>com.jawue</groupId>
       <artifactId>milkyway</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/milkyway-1.0-SNAPSHOT.jar</systemPath>
+      <version>1.1-SNAPSHOT</version>
     </dependency>
 
 
@@ -69,7 +67,21 @@
               </execution>
           </executions>
       </plugin>
- 
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>20</source>
+          <target>20</target>
+
+          <compilerArgs><arg>--enable-preview</arg></compilerArgs>
+        </configuration>
+      </plugin>
+
+
+
+
     </plugins>
   </build>
 </project>
