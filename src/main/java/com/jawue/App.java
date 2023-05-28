@@ -1,5 +1,7 @@
 package com.jawue;
 
+import com.jawue.milkyway.GuiObject;
+import com.jawue.milkyway.Label;
 import com.jawue.shared.Board;
 import com.jawue.shared.message.*;
 
@@ -89,22 +91,29 @@ public class App {
     com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
     com.jawue.milkyway.App.guiObjects.add(grid);
     Board board = new Board();
-
+    GuiObject label = new Label(grid.getX(), grid.getY() + grid.getHeight() + 50, grid.getWidth(), 100.0, "");
+    com.jawue.milkyway.App.guiObjects.add(label);
     while (true) {
       gui.draw();
       Message receivedMessage = messageQueue.poll();
       if (receivedMessage == null) {
         continue;
+
+      } else if (receivedMessage instanceof ConnectMessage) {
+        label.setText("You are connected bro");
       } else if (receivedMessage instanceof RequestMoveMessage) {
+        label.setText("Play your move!");
         grid.setEnabled(true);
       } else if (receivedMessage instanceof MoveResultMessage) {
         board = ((MoveResultMessage) receivedMessage).getBoard();
         grid.updateBoard(board);
       } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
+        label.setText("Other player is playing");
         grid.setEnabled(false);
       } else if (receivedMessage instanceof GameFinishedMessage) {
+        label.setText("Game Ends");
         grid.setEnabled(false);
-      } else if(receivedMessage instanceof PlayAgainMessage) {
+      } else if (receivedMessage instanceof PlayAgainMessage) {
 
       }
 

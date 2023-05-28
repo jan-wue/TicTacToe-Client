@@ -17,16 +17,13 @@ import java.util.List;
 
 
 public class Grid extends GuiObject {
-  Double x = 50.00;
-  Double y = 50.0;
-  Double width = 900.0;
-  Double height = 300.0;
+
   private final Double MARGIN = 20.00;
-  List<GuiObject> buttonList1 = new ArrayList<>();
-  List<GuiObject> buttonList2 = new ArrayList<>();
-  List<GuiObject> buttonList3 = new ArrayList<>();
-  List<GuiObject> layouts = new ArrayList<>();
-  ButtonStyle buttonStyle = new ButtonStyle(Color.WHITE, Color.WHITE, Color.BLACK, Color.WHITE, Color.BLUE, Color.BLACK, Color.WHITE, Color.YELLOW, Color.BLACK);
+  private List<GuiObject> buttonList1 = new ArrayList<>();
+  private List<GuiObject> buttonList2 = new ArrayList<>();
+  private List<GuiObject> buttonList3 = new ArrayList<>();
+  private List<GuiObject> layouts = new ArrayList<>();
+  private ButtonStyle buttonStyle = new ButtonStyle(Color.WHITE, Color.WHITE, Color.BLACK, Color.WHITE, Color.BLUE, Color.BLACK, Color.WHITE, Color.YELLOW, Color.BLACK);
   private List<com.jawue.milkyway.Image> images = new ArrayList<>();
 
   private String pathToXImage = "xImage.png";
@@ -43,10 +40,10 @@ public class Grid extends GuiObject {
   }
 
   public Grid(Double x, Double y, Double width, Double height, TicTacToeClient c) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+    this.setX(x);
+    this.setY(y);
+    this.setWidth(width);
+    this.setHeight(height);
     this.client = c;
     createButtons();
     createLayouts();
@@ -87,19 +84,19 @@ public class Grid extends GuiObject {
   }
 
   public void createLayouts() {
-    double y = this.y;
+    double y = this.getY();
     double distanceBetweenLayouts = 10;
     List<GuiObject> buttonList = buttonList1;
     for (int i = 0; i < 3; i++) {
       if (i == 1) {
-        y = this.y + this.height / 3 + distanceBetweenLayouts;
+        y = this.getY() + this.getHeight() / 3 + distanceBetweenLayouts;
         buttonList = buttonList2;
       }
       if (i == 2) {
-        y = this.y + (this.height / 3 * 2) + distanceBetweenLayouts * 2;
+        y = this.getY() + (this.getHeight() / 3 * 2) + distanceBetweenLayouts * 2;
         buttonList = buttonList3;
       }
-      Layout layout = new Layout(buttonList, this.width / 3, this.height / 3, this.x, y);
+      Layout layout = new Layout(buttonList, this.getWidth() / 3, this.getHeight() / 3, this.getX(), y);
       layouts.add(layout);
     }
   }
@@ -141,7 +138,7 @@ public class Grid extends GuiObject {
       for (int j = 0; j < board.getLength(); j++) {
         Button button = (Button) buttonList.get(j);
         if (this.board[i][j].equals(GameSymbol.X.getSYMBOL()) || this.board[i][j].equals(GameSymbol.O.getSYMBOL())) {
-           button.setEnabled(false);
+          button.setEnabled(false);
         } else {
           button.setEnabled(true);
         }
@@ -152,30 +149,30 @@ public class Grid extends GuiObject {
 
   public void createAndDrawLines(CodeDraw cd) {
     double buttonWidth = buttonList1.get(0).getWidth();
-    double xStart = this.x + buttonWidth + MARGIN + MARGIN / 2;
+    double xStart = this.getX() + buttonWidth + MARGIN + MARGIN / 2;
     double xEnd = xStart;
-    double yStart = this.y - 10;
-    double yEnd = yStart + this.height + 30;
+    double yStart = this.getY() - 10;
+    double yEnd = yStart + this.getHeight() + 30;
 
     Line line1Vertical = new Line(xStart, xEnd, yStart, yEnd);
     line1Vertical.draw(cd);
 
-    xStart = this.x + MARGIN * 2.5 + 2 * buttonWidth;
+    xStart = this.getX() + MARGIN * 2.5 + 2 * buttonWidth;
     xEnd = xStart;
 
     Line line2Vertical = new Line(xStart, xEnd, yStart, yEnd);
     line2Vertical.draw(cd);
 
-    xStart = MARGIN + this.x;
+    xStart = MARGIN + this.getX();
     xEnd = xStart + buttonWidth * 3 + 3 * MARGIN;
     double buttonHeight = buttonList1.get(0).getHeight();
-    yStart = this.y + 5 + buttonHeight;
+    yStart = this.getY() + 5 + buttonHeight;
     yEnd = yStart;
 
     Line lineHorizontal1 = new Line(xStart, xEnd, yStart, yEnd);
     lineHorizontal1.draw(cd);
 
-    yStart = this.y + 15 + buttonHeight * 2;
+    yStart = this.getY() + 15 + buttonHeight * 2;
     yEnd = yStart;
 
     Line lineHorizontal2 = new Line(xStart, xEnd, yStart, yEnd);
