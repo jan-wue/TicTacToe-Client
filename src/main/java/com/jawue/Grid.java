@@ -2,10 +2,12 @@ package com.jawue;
 
 import codedraw.CodeDraw;
 import codedraw.Event;
+import com.jawue.milkyway.Button;
 import com.jawue.milkyway.Image;
 import com.jawue.milkyway.*;
 import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
+import com.jawue.shared.message.GameSymbol;
 import com.jawue.shared.message.PlayerMoveMessage;
 import com.jawue.milkyway.GuiObject;
 
@@ -67,7 +69,7 @@ public class Grid extends GuiObject {
     createImagesAndAddToList();
     for (com.jawue.milkyway.Image image : images) {
       codedraw.Image cdImage;
-      if (image.getPlayerChar().equals("X")) {
+      if (image.getPlayerChar().equals(GameSymbol.X.getSYMBOL())) {
         cdImage = this.xImage;
       } else {
         cdImage = this.oImage;
@@ -114,7 +116,6 @@ public class Grid extends GuiObject {
           PlayerMove playerMove = new PlayerMove(row, column);
           client.sendMessage(new PlayerMoveMessage(playerMove));
 
-          this.setEnabled(false);
 
         }
       };
@@ -130,7 +131,22 @@ public class Grid extends GuiObject {
 
   public void updateBoard(Board board) {
     this.board = board.getBoard();
-    //@todo disable buttons here
+    List<GuiObject> buttonList = buttonList1;
+    for (int i = 0; i < board.getLength(); i++) {
+      if (i == 1) {
+        buttonList = buttonList2;
+      } else if (i == 2) {
+        buttonList = buttonList3;
+      }
+      for (int j = 0; j < board.getLength(); j++) {
+        Button button = (Button) buttonList.get(j);
+        if (this.board[i][j].equals(GameSymbol.X.getSYMBOL()) || this.board[i][j].equals(GameSymbol.O.getSYMBOL())) {
+           button.setEnabled(false);
+        } else {
+          button.setEnabled(true);
+        }
+      }
+    }
 
   }
 
@@ -181,11 +197,11 @@ public class Grid extends GuiObject {
         if (board[i][j] == null) {
           continue;
         }
-        if (board[i][j].equals("O")) {
-          com.jawue.milkyway.Image image = new com.jawue.milkyway.Image("O", button.getX(), button.getY(), button.getWidth(), button.getHeight());
+        if (board[i][j].equals(GameSymbol.O.getSYMBOL())) {
+          com.jawue.milkyway.Image image = new com.jawue.milkyway.Image(GameSymbol.O.getSYMBOL(), button.getX(), button.getY(), button.getWidth(), button.getHeight());
           this.images.add(image);
-        } else if (board[i][j].equals("X")) {
-          com.jawue.milkyway.Image image = new Image("X", button.getX(), button.getY(), button.getWidth(), button.getHeight());
+        } else if (board[i][j].equals(GameSymbol.X.getSYMBOL())) {
+          com.jawue.milkyway.Image image = new Image(GameSymbol.X.getSYMBOL(), button.getX(), button.getY(), button.getWidth(), button.getHeight());
           this.images.add(image);
         }
 

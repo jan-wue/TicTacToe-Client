@@ -22,7 +22,7 @@ public class App {
               "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
       //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
 
-      if( args.length > 0 && args[0].equals("--terminal")) {
+      if (args.length > 0 && args[0].equals("--terminal")) {
         app.runTerminalClient(client);
       } else {
         app.runGui(client);
@@ -35,7 +35,7 @@ public class App {
 
   public void runTerminalClient(TicTacToeClient client) {
     try {
-     client.connectBlocking();
+      client.connectBlocking();
       Message receivedMessage;
       UserInteraction userInteraction = new Terminal();
       Board board = new Board();
@@ -80,29 +80,37 @@ public class App {
 
   }
 
-    public void runGui(TicTacToeClient client) {
-      ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
-      WebsocketThread websockedThread = new WebsocketThread(client, messageQueue);
-      websockedThread.start();
-      Grid grid = new Grid(client);
-      com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
-      com.jawue.milkyway.App.guiObjects.add(grid);
-      Board board = new Board();
+  public void runGui(TicTacToeClient client) {
+    ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+    WebsocketThread websockedThread = new WebsocketThread(client, messageQueue);
+    websockedThread.start();
+    Grid grid = new Grid(client);
+    grid.setEnabled(false);
+    com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
+    com.jawue.milkyway.App.guiObjects.add(grid);
+    Board board = new Board();
 
-      while (true) {
-        gui.draw();
-        Message receivedMessage = messageQueue.poll();
-        if(receivedMessage == null) {
-          continue;
-        }
-        if (receivedMessage instanceof MoveResultMessage) {
-          board = ((MoveResultMessage) receivedMessage).getBoard();
-          grid.updateBoard(board);
-        }
+    while (true) {
+      gui.draw();
+      Message receivedMessage = messageQueue.poll();
+      if (receivedMessage == null) {
+        continue;
+      } else if (receivedMessage instanceof RequestMoveMessage) {
+        grid.setEnabled(true);
+      } else if (receivedMessage instanceof MoveResultMessage) {
+        board = ((MoveResultMessage) receivedMessage).getBoard();
+        grid.updateBoard(board);
+      } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
+        grid.setEnabled(false);
+      } else if (receivedMessage instanceof GameFinishedMessage) {
+        grid.setEnabled(false);
+      } else if(receivedMessage instanceof PlayAgainMessage) {
 
       }
 
     }
+
+  }
 
   public static boolean getPlayerAnswer(Message receivedMessage) {
     Scanner input = new Scanner(System.in);
