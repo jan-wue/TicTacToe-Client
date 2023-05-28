@@ -91,7 +91,7 @@ public class App {
 
       while (true) {
         gui.draw();
-        Message receivedMessage = messageQueue.peek();
+        Message receivedMessage = messageQueue.poll();
         if(receivedMessage == null) {
           continue;
         }

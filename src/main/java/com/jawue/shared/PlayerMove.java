@@ -15,8 +15,8 @@ public class PlayerMove {
     this.column = column;
   }
   public PlayerMove(int row , int column) {
-     this.column = (char) ('A' +  row);
-     this.row = (char) ( '0' + column);
+     this.column = (char) ('A' +  column);
+     this.row = (char) ( '0' + row);
   }
 
   public Character getRow() {

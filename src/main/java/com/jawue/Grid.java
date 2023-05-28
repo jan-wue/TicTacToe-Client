@@ -27,9 +27,9 @@ public class Grid extends GuiObject {
   ButtonStyle buttonStyle = new ButtonStyle(Color.WHITE, Color.WHITE, Color.BLACK, Color.WHITE, Color.BLUE, Color.BLACK, Color.WHITE, Color.YELLOW, Color.BLACK);
   private List<com.jawue.milkyway.Image> images = new ArrayList<>();
 
-  private String pathToXImage = "/xImage.png";
+  private String pathToXImage = "xImage.png";
 
-  private String pathToOImage = "/oImage.png";
+  private String pathToOImage = "oImage.png";
   private String[][] board = new String[3][3];
   private TicTacToeClient client;
   private codedraw.Image xImage;
@@ -49,8 +49,9 @@ public class Grid extends GuiObject {
     createButtons();
     createLayouts();
     try {
-      this.oImage = codedraw.Image.fromFile(this.getClass().getResource(pathToOImage).toURI().getPath());
-      this.xImage = codedraw.Image.fromFile(this.getClass().getResource(pathToXImage).toURI().getPath());
+      this.oImage = codedraw.Image.fromResource(pathToOImage);
+      this.xImage = codedraw.Image.fromResource(pathToXImage);
+
     } catch (Exception ex) {
       System.err.println(ex);
 

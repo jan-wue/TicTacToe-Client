@@ -1,5 +1,6 @@
 package com.jawue;
 
+import com.jawue.shared.PlayerMove;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,5 +35,11 @@ public class AppTest
     public void testApp()
     {
         assertTrue( true );
+    }
+
+    public void testPlayerMoveConstructor() {
+        PlayerMove playerMove = new PlayerMove(2, 1);
+        assertEquals(playerMove.getRow(), (Character) '2' );
+        assertEquals(playerMove.getColumn(), (Character) 'B');
     }
 }

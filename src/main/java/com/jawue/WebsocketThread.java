@@ -1,6 +1,6 @@
-package com.jawue.shared.message;
+package com.jawue;
 
-import com.jawue.TicTacToeClient;
+import com.jawue.shared.message.Message;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
