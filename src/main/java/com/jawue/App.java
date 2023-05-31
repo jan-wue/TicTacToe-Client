@@ -1,5 +1,6 @@
 package com.jawue;
 
+import com.jawue.milkyway.Button;
 import com.jawue.milkyway.GuiObject;
 import com.jawue.milkyway.Label;
 import com.jawue.shared.Board;
@@ -37,45 +38,58 @@ public class App {
 
   public void runTerminalClient(TicTacToeClient client) {
     try {
-      client.connectBlocking();
-      Message receivedMessage;
-      UserInteraction userInteraction = new Terminal();
-      Board board = new Board();
-      board.initialize();
-      board.print();
-      while (true) {
-        receivedMessage = client.nextMessageBlocking();
-        if (receivedMessage instanceof RequestMoveMessage) {
-          Message message = new PlayerMoveMessage();
-          ((PlayerMoveMessage) message).setPlayerMove(userInteraction.getMove());
-          client.sendMessage(message);
-        } else if (receivedMessage instanceof MoveResultMessage) {
-          MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
-          if (moveResultMessage.getErrorMessage() == null) {
-            board = moveResultMessage.getBoard();
-            board.print();
-          } else {
+      boolean applicationIsRunning = true;
+      while (applicationIsRunning) {
+        client.connectBlocking();
+        Message receivedMessage;
+        UserInteraction userInteraction = new Terminal();
+        Board board = new Board();
+        board.initialize();
+        board.print();
+        boolean gameIsRunning = true;
+        while (gameIsRunning) {
+          receivedMessage = client.nextMessageBlocking();
+          if (receivedMessage instanceof GameStartsMessage) {
+            System.out.println("Game starts");
+          } else if (receivedMessage instanceof RequestMoveMessage) {
             Message message = new PlayerMoveMessage();
-            System.out.println(moveResultMessage.getErrorMessage());
-            System.out.println();
+            ((PlayerMoveMessage) message).setPlayerMove(userInteraction.getMove());
+            client.sendMessage(message);
+          } else if (receivedMessage instanceof MoveResultMessage) {
+            MoveResultMessage moveResultMessage = (MoveResultMessage) receivedMessage;
+            if (moveResultMessage.getErrorMessage() == null) {
+              board = moveResultMessage.getBoard();
+              board.print();
+            } else {
+              Message message = new PlayerMoveMessage();
+              System.out.println(moveResultMessage.getErrorMessage());
+              System.out.println();
+            }
+
+          } else if (receivedMessage instanceof ConnectMessage) {
+            System.out.println("you are connected bro");
+          } else if (receivedMessage instanceof GameResultMessage) {
+            System.out.println(receivedMessage);
+            String message = ((GameResultMessage) receivedMessage).getResult();
+            System.out.println(message + "  troloolololololo");
+
+          } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
+            System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
+          } else if (receivedMessage instanceof PlayAgainMessage) {
+            PlayAgainMessage message = new PlayAgainMessage();
+            boolean playerAnswer = getPlayerAnswer(receivedMessage);
+            message.setPlayerAnswer(playerAnswer);
+            client.sendMessage(message);
+          } else if (receivedMessage instanceof GameFinishedMessage) {
+            String message = ((GameFinishedMessage) receivedMessage).getMessage();
+            System.out.println(message);
+            gameIsRunning = false;
+            applicationIsRunning = false;
+          } else if(receivedMessage instanceof NewGameStartsMessage) {
+            gameIsRunning = false;
           }
-
-        } else if (receivedMessage instanceof ConnectMessage) {
-          System.out.println("you are connected bro");
-        } else if (receivedMessage instanceof GameFinishedMessage) {
-          GameFinishedMessage gameFinishedMessage = (GameFinishedMessage) receivedMessage;
-          System.out.println(gameFinishedMessage.getResult());
-
-        } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
-          System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
-        } else if (receivedMessage instanceof PlayAgainMessage) {
-          PlayAgainMessage message = new PlayAgainMessage();
-          boolean playerAnswer = getPlayerAnswer(receivedMessage);
-          message.setPlayerAnswer(playerAnswer);
-          client.sendMessage(message);
         }
       }
-
     } catch (Exception ignored) {
       System.err.println(ignored.getMessage());
     }
@@ -83,42 +97,90 @@ public class App {
   }
 
   public void runGui(TicTacToeClient client) {
-    ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
-    WebsocketThread websockedThread = new WebsocketThread(client, messageQueue);
-    websockedThread.start();
-    Grid grid = new Grid(client);
-    grid.setEnabled(false);
-    com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
-    com.jawue.milkyway.App.guiObjects.add(grid);
-    Board board = new Board();
-    GuiObject label = new Label(grid.getX(), grid.getY() + grid.getHeight() + 50, grid.getWidth(), 100.0, "");
-    com.jawue.milkyway.App.guiObjects.add(label);
-    while (true) {
-      gui.draw();
-      Message receivedMessage = messageQueue.poll();
-      if (receivedMessage == null) {
-        continue;
+    boolean applicationRuns = true;
+    while (applicationRuns) {
+      ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+      WebsocketThread websocketThread = new WebsocketThread(client, messageQueue);
+      websocketThread.start();
+      Grid grid = new Grid(client);
+      grid.setEnabled(false);
+      com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
+      List<GuiObject> guiObjects = com.jawue.milkyway.App.guiObjects;
+      guiObjects.add(grid);
+      GuiObject label = new Label(grid.getX() - 100, grid.getY() + grid.getHeight() + 50, grid.getWidth(), 100.0, "");
+      Board board;
+      guiObjects.add(label);
+      boolean gameRuns = true;
+      while (gameRuns) {
+        gui.draw();
+        try {
+          Thread.sleep(200);
+        } catch (Exception ex) {
+          System.err.println(ex);
+        }
+        Message receivedMessage = messageQueue.poll();
+        if (receivedMessage == null) {
+          continue;
 
-      } else if (receivedMessage instanceof ConnectMessage) {
-        label.setText("You are connected bro");
-      } else if (receivedMessage instanceof RequestMoveMessage) {
-        label.setText("Play your move!");
-        grid.setEnabled(true);
-      } else if (receivedMessage instanceof MoveResultMessage) {
-        board = ((MoveResultMessage) receivedMessage).getBoard();
-        grid.updateBoard(board);
-      } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
-        label.setText("Other player is playing");
-        grid.setEnabled(false);
-      } else if (receivedMessage instanceof GameFinishedMessage) {
-        label.setText("Game Ends");
-        grid.setEnabled(false);
-      } else if (receivedMessage instanceof PlayAgainMessage) {
+        } else if (receivedMessage instanceof GameStartsMessage) {
+          String message = ((GameStartsMessage) receivedMessage).getGameStartsMessage();
+          label.setText(message);
+        } else if (receivedMessage instanceof ConnectMessage) {
+          label.setText("You are connected bro");
+
+        } else if (receivedMessage instanceof RequestMoveMessage) {
+          label.setText("Play your move!");
+          grid.setEnabled(true);
+        } else if (receivedMessage instanceof MoveResultMessage) {
+          board = ((MoveResultMessage) receivedMessage).getBoard();
+          grid.updateBoard(board);
+        } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
+          String message = ((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage();
+          label.setText(message);
+          grid.setEnabled(false);
+        } else if (receivedMessage instanceof GameResultMessage) {
+          GameResultMessage message = (GameResultMessage) receivedMessage;
+          label.setText(message.getResult());
+          grid.setEnabled(false);
+        } else if (receivedMessage instanceof PlayAgainMessage) {
+          List<Message> playAgainMessages = new ArrayList<>();
+          PlayAgainMessage playAgainMessage = new PlayAgainMessage();
+          Button noButton = new Button() {
+            @Override
+            public void executeMouseClickEvent() {
+              playAgainMessage.setPlayerAnswer(false);
+              playAgainMessages.add(playAgainMessage);
+
+            }
+          };
+          Button yesButton = new Button() {
+            @Override
+            public void executeMouseClickEvent() {
+
+              playAgainMessage.setPlayerAnswer(true);
+              playAgainMessages.add(playAgainMessage);
+
+            }
+          };
+          List<Button> buttons = new ArrayList<>(Arrays.asList(yesButton, noButton));
+          Modal modal = new Modal(buttons, 500.0, 400.0, "Hey ma bra, would ya like to play again?", gui.cd);
+          guiObjects.clear();
+          guiObjects.add(modal);
+          while (playAgainMessages.isEmpty()) {
+            gui.draw();
+          }
+          client.sendMessage(playAgainMessages.get(0));
+
+        } else if (receivedMessage instanceof GameFinishedMessage) {
+          String message = ((GameFinishedMessage) receivedMessage).getMessage();
+          label.setText(message);
+          gui.draw();
+          gameRuns = false;
+          applicationRuns = false;
+        }
 
       }
-
     }
-
   }
 
   public static boolean getPlayerAnswer(Message receivedMessage) {

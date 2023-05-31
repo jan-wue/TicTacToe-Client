@@ -45,7 +45,6 @@ public class TicTacToeClient extends WebSocketClient {
     try {
       //ignores boardIsFull method in webserver
       mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
       Message messageObject = mapper.readValue(message, Message.class);
       messages.add(messageObject);
     } catch(Exception error) {
