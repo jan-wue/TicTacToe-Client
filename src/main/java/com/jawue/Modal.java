@@ -6,6 +6,7 @@ import com.jawue.milkyway.Button;
 import com.jawue.milkyway.GuiObject;
 import com.jawue.milkyway.Label;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class Modal extends GuiObject {
   }
   @Override
   public void draw(CodeDraw cd) {
+    cd.setColor(Color.BLACK);
     cd.drawRectangle(this.getX(), this.getY(), this.getWidth(), this.getHeight());
     this.label.draw(cd);
     for(Button button : options) {

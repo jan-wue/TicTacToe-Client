@@ -22,8 +22,10 @@ public class App {
     try {
       App app = new App();
       TicTacToeClient client = new TicTacToeClient(new URI(
-              "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+      //        "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
       //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+      "ws://janwue.com:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+
 
       if (args.length > 0 && args[0].equals("--terminal")) {
         app.runTerminalClient(client);
@@ -39,8 +41,9 @@ public class App {
   public void runTerminalClient(TicTacToeClient client) {
     try {
       boolean applicationIsRunning = true;
+
+      client.connectBlocking();
       while (applicationIsRunning) {
-        client.connectBlocking();
         Message receivedMessage;
         UserInteraction userInteraction = new Terminal();
         Board board = new Board();
@@ -97,11 +100,13 @@ public class App {
   }
 
   public void runGui(TicTacToeClient client) {
+
+    ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
+    WebsocketThread websocketThread = new WebsocketThread(client, messageQueue);
+    websocketThread.start();
     boolean applicationRuns = true;
     while (applicationRuns) {
-      ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
-      WebsocketThread websocketThread = new WebsocketThread(client, messageQueue);
-      websocketThread.start();
+
       Grid grid = new Grid(client);
       grid.setEnabled(false);
       com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
@@ -113,15 +118,10 @@ public class App {
       boolean gameRuns = true;
       while (gameRuns) {
         gui.draw();
-        try {
-          Thread.sleep(200);
-        } catch (Exception ex) {
-          System.err.println(ex);
-        }
+        
         Message receivedMessage = messageQueue.poll();
         if (receivedMessage == null) {
           continue;
-
         } else if (receivedMessage instanceof GameStartsMessage) {
           String message = ((GameStartsMessage) receivedMessage).getGameStartsMessage();
           label.setText(message);
@@ -141,35 +141,34 @@ public class App {
         } else if (receivedMessage instanceof GameResultMessage) {
           GameResultMessage message = (GameResultMessage) receivedMessage;
           label.setText(message.getResult());
+          try {
+            Thread.sleep(1000);
+          } catch (Exception ex) {
+            System.err.println(ex);
+          }
           grid.setEnabled(false);
         } else if (receivedMessage instanceof PlayAgainMessage) {
-          List<Message> playAgainMessages = new ArrayList<>();
           PlayAgainMessage playAgainMessage = new PlayAgainMessage();
-          Button noButton = new Button() {
+          Button noButton = new Button("no") {
             @Override
             public void executeMouseClickEvent() {
               playAgainMessage.setPlayerAnswer(false);
-              playAgainMessages.add(playAgainMessage);
+              client.sendMessage(playAgainMessage);
 
             }
           };
-          Button yesButton = new Button() {
+          Button yesButton = new Button("yes") {
             @Override
             public void executeMouseClickEvent() {
-
               playAgainMessage.setPlayerAnswer(true);
-              playAgainMessages.add(playAgainMessage);
+              client.sendMessage(playAgainMessage);
 
             }
           };
           List<Button> buttons = new ArrayList<>(Arrays.asList(yesButton, noButton));
-          Modal modal = new Modal(buttons, 500.0, 400.0, "Hey ma bra, would ya like to play again?", gui.cd);
+          Modal modal = new Modal(buttons, 500.0, 400.0, "Hey would you like to play again?", gui.cd);
           guiObjects.clear();
           guiObjects.add(modal);
-          while (playAgainMessages.isEmpty()) {
-            gui.draw();
-          }
-          client.sendMessage(playAgainMessages.get(0));
 
         } else if (receivedMessage instanceof GameFinishedMessage) {
           String message = ((GameFinishedMessage) receivedMessage).getMessage();
@@ -177,6 +176,12 @@ public class App {
           gui.draw();
           gameRuns = false;
           applicationRuns = false;
+        }
+        else if(receivedMessage instanceof NewGameStartsMessage) {
+          String message = ((NewGameStartsMessage) receivedMessage).getMessage();
+          label.setText(message);
+          gameRuns = false;
+          guiObjects.clear();
         }
 
       }
