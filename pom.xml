@@ -4,12 +4,12 @@
   <groupId>com.jawue</groupId>
   <artifactId>client-tictactoe</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-RELEASE</version>
   <name>client-tictactoe</name>
   <url>http://maven.apache.org</url>
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>20</maven.compiler.source>
+    <maven.compiler.target>20</maven.compiler.target>
   </properties>
   <dependencies>
 
@@ -35,13 +35,14 @@
     <dependency>
       <groupId>com.jawue</groupId>
       <artifactId>milkyway</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.7-SNAPSHOT</version>
     </dependency>
 
 
   </dependencies>
 
   <build>
+
     <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

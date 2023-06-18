@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = GameStartsMessage.class, name = "gameStartsMessage" ),
         @JsonSubTypes.Type(value = GameFinishedMessage.class, name = "gameFinishedMessage" ),
         @JsonSubTypes.Type(value = NewGameStartsMessage.class, name = "newGameStartsMessage" ),
+        @JsonSubTypes.Type(value = DisconnectMessage.class, name = "disconnectMessage"),
 })
 
 public abstract class  Message {

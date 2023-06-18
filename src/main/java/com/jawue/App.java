@@ -6,7 +6,12 @@ import com.jawue.milkyway.Label;
 import com.jawue.shared.Board;
 import com.jawue.shared.message.*;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.awt.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +26,32 @@ public class App {
 
     try {
       App app = new App();
-      TicTacToeClient client = new TicTacToeClient(new URI(
-      //        "ws://localhost:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
-      //"ws://192.168.1.30:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
-      "ws://janwue.com:7070/websocket")); // more about drafts here: http://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
+      String localHost = "ws://localhost:7070/websocket";
+      String gandalf = "wss://janwue.com/tictactoe/websocket";
+      String environment = System.getenv("APP_ENV");
+      String webSocketURL;
+      if (environment == null ) {
+        System.out.println("set the APP_ENV environment variable either to 'development' or 'production' ");
+        return;
+      } else if (environment.equals("development")) {
+        webSocketURL = localHost;
+      } else if(environment.equals("production")) {
+        webSocketURL = gandalf;
+      } else {
+        System.out.println("set the APP_ENV environment variable either to 'development' or 'production' ");
+        return;
+      }
+
+
+      System.out.println("run in environment: " + environment);
+      TicTacToeClient client = new TicTacToeClient(new URI(webSocketURL));
+      Thread thread = new Thread() { //if a player closes the application notify server
+        public void run(){
+          client.close();
+        }
+      };
+
+      Runtime.getRuntime().addShutdownHook(thread);
 
 
       if (args.length > 0 && args[0].equals("--terminal")) {
@@ -72,9 +99,8 @@ public class App {
           } else if (receivedMessage instanceof ConnectMessage) {
             System.out.println("you are connected bro");
           } else if (receivedMessage instanceof GameResultMessage) {
-            System.out.println(receivedMessage);
             String message = ((GameResultMessage) receivedMessage).getResult();
-            System.out.println(message + "  troloolololololo");
+            System.out.println(message);
 
           } else if (receivedMessage instanceof WaitForOtherPlayerMessage) {
             System.out.println(((WaitForOtherPlayerMessage) receivedMessage).getWaitMessage());
@@ -88,8 +114,13 @@ public class App {
             System.out.println(message);
             gameIsRunning = false;
             applicationIsRunning = false;
-          } else if(receivedMessage instanceof NewGameStartsMessage) {
+          } else if (receivedMessage instanceof NewGameStartsMessage) {
             gameIsRunning = false;
+          } else if (receivedMessage instanceof DisconnectMessage) {
+            String message = ((DisconnectMessage) receivedMessage).getMessage();
+            System.out.println(message);
+            gameIsRunning = false;
+            applicationIsRunning = false;
           }
         }
       }
@@ -101,6 +132,7 @@ public class App {
 
   public void runGui(TicTacToeClient client) {
 
+    playMusic();
     ConcurrentLinkedQueue<Message> messageQueue = new ConcurrentLinkedQueue<>();
     WebsocketThread websocketThread = new WebsocketThread(client, messageQueue);
     websocketThread.start();
@@ -110,15 +142,24 @@ public class App {
       Grid grid = new Grid(client);
       grid.setEnabled(false);
       com.jawue.milkyway.App gui = new com.jawue.milkyway.App();
+      gui.event.onClose(e -> {
+        try {
+          Thread.sleep(5000);
+        } catch (Exception xx) {
+
+        }
+      });
+
       List<GuiObject> guiObjects = com.jawue.milkyway.App.guiObjects;
       guiObjects.add(grid);
       GuiObject label = new Label(grid.getX() - 100, grid.getY() + grid.getHeight() + 50, grid.getWidth(), 100.0, "");
       Board board;
       guiObjects.add(label);
+
       boolean gameRuns = true;
       while (gameRuns) {
         gui.draw();
-        
+
         Message receivedMessage = messageQueue.poll();
         if (receivedMessage == null) {
           continue;
@@ -141,8 +182,9 @@ public class App {
         } else if (receivedMessage instanceof GameResultMessage) {
           GameResultMessage message = (GameResultMessage) receivedMessage;
           label.setText(message.getResult());
+          gui.draw();
           try {
-            Thread.sleep(1000);
+            Thread.sleep(4000);
           } catch (Exception ex) {
             System.err.println(ex);
           }
@@ -154,7 +196,6 @@ public class App {
             public void executeMouseClickEvent() {
               playAgainMessage.setPlayerAnswer(false);
               client.sendMessage(playAgainMessage);
-
             }
           };
           Button yesButton = new Button("yes") {
@@ -165,23 +206,51 @@ public class App {
 
             }
           };
-          List<Button> buttons = new ArrayList<>(Arrays.asList(yesButton, noButton));
-          Modal modal = new Modal(buttons, 500.0, 400.0, "Hey would you like to play again?", gui.cd);
+
+          Modal modal = new Modal(new ArrayList<>(Arrays.asList(noButton, yesButton)), 500.0, 400.0, "Hey would you like to play again?", gui.cd);
           guiObjects.clear();
           guiObjects.add(modal);
 
         } else if (receivedMessage instanceof GameFinishedMessage) {
           String message = ((GameFinishedMessage) receivedMessage).getMessage();
-          label.setText(message);
-          gui.draw();
+           label.setText(message);
+           guiObjects.clear();
+           guiObjects.add(label);
+           gui.draw();
+          try{
+           Thread.sleep(4000);
+          } catch (Exception ex) {
+
+          }
           gameRuns = false;
           applicationRuns = false;
-        }
-        else if(receivedMessage instanceof NewGameStartsMessage) {
+          System.exit(0);
+        } else if (receivedMessage instanceof NewGameStartsMessage) {
           String message = ((NewGameStartsMessage) receivedMessage).getMessage();
-          label.setText(message);
+          label.setText(message + " new game starts");
+          guiObjects.clear();
+          guiObjects.add(label);
+          gui.cd.setColor(Color.BLACK);
+          gui.draw();
+          try{
+            Thread.sleep(5000);
+          } catch (Exception ex) {
+
+          }
+          gui.cd.close();
           gameRuns = false;
           guiObjects.clear();
+        } else if (receivedMessage instanceof DisconnectMessage) {
+          String message = ((DisconnectMessage) receivedMessage).getMessage();
+          label.setText(message);
+          gui.draw();
+          try {
+            Thread.sleep(5000);
+          } catch (Exception ex) {
+            ex.printStackTrace();
+          }
+          gameRuns = false;
+          applicationRuns = false;
         }
 
       }
@@ -211,5 +280,24 @@ public class App {
       isInputValid = true;
     }
     return false;
+  }
+
+  public void playMusic() {
+    String musicPath = "cartelmusic.wav";
+    try {
+      URL url = getClass().getClassLoader().getResource(musicPath);
+      System.out.println(url);
+      if (url != null) {
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioInputStream);
+        clip.start();
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+      } else {
+      }
+   } catch (Exception ex) {
+      System.err.println(ex);
+    }
+
   }
 }

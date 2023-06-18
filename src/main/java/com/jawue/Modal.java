@@ -56,4 +56,5 @@ public class Modal extends GuiObject {
       button.handleEvent(mouseX, mouseY, event);
     }
   }
+
 }
