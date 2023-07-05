@@ -74,9 +74,6 @@ public class Board {
     if(!VALIDROWCHARS.contains(playerMove.getRow()) || !VALIDCOLUMNCHARS.contains(playerMove.getColumn())) {
       return false;
     }
-
-
-
     return true;
   }
 
@@ -84,11 +81,7 @@ public class Board {
     int rowIndex = Character.getNumericValue(playerMove.getRow());
     int columnIndex = playerMove.getColumn() - 'A';
     this.initialize();
-
-    if(!this.board[rowIndex][columnIndex].equals(GameSymbol.Empty.getSYMBOL())) {
-      return true;
-    }
-    return false;
+    return !this.board[rowIndex][columnIndex].equals(GameSymbol.Empty.getSYMBOL());
   }
   public boolean isBoardFull() {
      return !Arrays.stream(this.board).flatMap(x -> Arrays.stream(x)).anyMatch(x -> x.equals(GameSymbol.Empty.getSYMBOL()));

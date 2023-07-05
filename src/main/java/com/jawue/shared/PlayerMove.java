@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize
 public class PlayerMove {
-  private Character row;
-  private Character  column;
+  private char row;
+  private char  column;
 
   public PlayerMove() {
   }
 
-  public PlayerMove(Character row, Character column) {
+  public PlayerMove(char row, char column) {
     this.row = row;
     this.column = column;
   }

@@ -1,6 +1,8 @@
 package com.jawue;
 
+import com.jawue.shared.Board;
 import com.jawue.shared.PlayerMove;
+import com.jawue.shared.message.GameSymbol;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -42,4 +44,20 @@ public class AppTest
         assertEquals(playerMove.getRow(), (Character) '2' );
         assertEquals(playerMove.getColumn(), (Character) 'B');
     }
+
+    public void testIsFieldOccupied() {
+        Board board = new Board();
+        PlayerMove playerMove = new PlayerMove(0,1);
+        PlayerMove playerMoveOccupied = new PlayerMove(1, 0);
+        PlayerMove playerMove2 = new PlayerMove('0', 'A');
+        board.fill(playerMoveOccupied, GameSymbol.X);
+
+        assertFalse( board.isFieldOccupied(playerMove));
+        assertTrue(board.isFieldOccupied(playerMoveOccupied));
+        assertEquals(false, board.isFieldOccupied(playerMove2));
+
+    }
+
+
+
 }
